@@ -4,6 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff } from "lucide-react";
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth";
+import { auth } from "../firebase";
+import Toast from "../components/toast";
+import { useToast } from "../hooks/useToast";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -16,6 +20,7 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast, showToast, hideToast } = useToast();
 
   const router = useRouter();
 
@@ -29,27 +34,38 @@ export default function SignupPage() {
     const { name, email, password, confirmPassword } = formData;
 
     if (!name || !email || !password || !confirmPassword) {
-      alert('Please fill in all fields');
+      showToast('Please fill in all fields', 'error');
       return;
     }
 
     if (password !== confirmPassword) {
-      alert('Passwords do not match');
+      showToast('Passwords do not match', 'error');
       return;
     }
 
     if (password.length < 6) {
-      alert('Password must be at least 6 characters long');
+      showToast('Password must be at least 6 characters long', 'error');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Implement signup logic here (Auth0 / API)
-      router.push('/');
+      // 1️⃣ Create user with Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // 2️⃣ Update display name
+      await updateProfile(user, { displayName: name });
+
+      // 3️⃣ Send email verification
+      await sendEmailVerification(user);
+
+      // 4️⃣ Notify user and redirect
+      showToast("Signup successful! Please verify your email before logging in.", "success");
+      setTimeout(() => router.push("/login"), 2000);
     } catch (error) {
-      alert('Signup failed. Please try again.');
+      showToast(error.message, "error");
     } finally {
       setIsLoading(false);
     }
@@ -163,6 +179,12 @@ export default function SignupPage() {
           </div>
         </form>
       </div>
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
     </div>
   );
 }

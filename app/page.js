@@ -1,12 +1,12 @@
 'use client';
-
+import ProtectedRoute from './components/protectedroutes';
 import Link from 'next/link';
 import LayoutWithSidebar from './components/layout-with-sidebar';
 
 
 export default function Home() {
   return (
-   
+      <ProtectedRoute>
       <LayoutWithSidebar>
         <div className="flex items-center justify-center p-4 min-h-screen">
           <div className="bg-white p-6 md:p-8 rounded-xl shadow-md w-full max-w-md space-y-6 text-center">
@@ -22,15 +22,16 @@ export default function Home() {
               </Link>
               
               <Link 
-                href="/store-dashboard" 
+                href="/orders" 
                 className="block w-full font-sans bg-white-600 text-black py-3 px-6 rounded-lg hover:bg-black-700 transition font-semibold"
               >
-                Go to Dashboard
+                Go to Orders
               </Link>
             </div>
           </div>
         </div>
       </LayoutWithSidebar>
+      </ProtectedRoute>
   
   );
 }

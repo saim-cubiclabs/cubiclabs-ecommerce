@@ -1,15 +1,24 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import {
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import { auth } from "../firebase";
+import Toast from "../components/toast";
+import { useToast } from "../hooks/useToast";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast, showToast, hideToast } = useToast();
 
   const router = useRouter();
 
@@ -17,19 +26,58 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!email || !password) {
-      alert('Please fill in all fields');
+      showToast("Please fill in all fields", "error");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Implement login logic here (Auth0 / API)
-      router.push('/');
+      // 1️⃣ Sign in with Firebase
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // 2️⃣ Check if email is verified
+      if (!user.emailVerified) {
+        showToast("Please verify your email before logging in.", "warning");
+
+        // Optionally resend verification email
+        const resend = confirm("Resend verification email?");
+        if (resend) {
+          await sendEmailVerification(user);
+          showToast("Verification email sent!", "success");
+        }
+
+        await auth.signOut(); // Prevent login until verified
+        setIsLoading(false);
+        return;
+      }
+
+      // 3️⃣ Login successful → redirect
+      showToast("Login successful!", "success");
+      setTimeout(() => router.push("/"), 1000);
     } catch (error) {
-      alert('Login failed. Please try again.');
+      showToast(error.message, "error");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      showToast("Please enter your email to reset password", "error");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showToast("Password reset email sent! Check your inbox.", "success");
+    } catch (error) {
+      showToast(error.message, "error");
     }
   };
 
@@ -43,7 +91,10 @@ export default function LoginPage() {
         <form className="space-y-6" onSubmit={handleLogin}>
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Email address
             </label>
             <input
@@ -59,7 +110,10 @@ export default function LoginPage() {
 
           {/* Password */}
           <div className="relative">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <input
@@ -79,6 +133,14 @@ export default function LoginPage() {
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
+
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-black hover:text-black font-medium"
+            >
+              Forgot password?
+            </button>
           </div>
 
           {/* Submit */}
@@ -87,20 +149,29 @@ export default function LoginPage() {
             disabled={isLoading}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-black hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50"
           >
-            {isLoading ? 'Logging in...' : 'Log in'}
+            {isLoading ? "Logging in..." : "Log in"}
           </button>
 
           {/* Signup link */}
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link href="/signup" className="font-medium text-black hover:text-black">
+              Don't have an account?{" "}
+              <Link
+                href="/signup"
+                className="font-medium text-black hover:text-black"
+              >
                 Sign up
               </Link>
             </p>
           </div>
         </form>
       </div>
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
     </div>
   );
 }
