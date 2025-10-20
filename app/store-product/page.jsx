@@ -47,16 +47,20 @@ export default function StoreProduct() {
 
   return (
     <LayoutWithSidebar>
-      <div className="p-4 md:p-6">
+      <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl md:text-3xl font-bold mb-6 font-sans text-center">Product Management</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 text-center">
+            Product Management
+          </h1>
 
           {/* Add Product Form */}
           <form
             onSubmit={handleAddProduct}
             className="bg-white p-4 md:p-6 rounded-xl shadow-md space-y-4 mb-8"
           >
-            <h2 className="text-xl font-semibold font-sans text-center">Add a Product</h2>
+            <h2 className="text-xl font-semibold text-gray-800 text-center">
+              Add a Product
+            </h2>
 
             <input
               type="text"
@@ -91,8 +95,14 @@ export default function StoreProduct() {
             />
 
             <div>
-              <label className="block font-semibold mb-1">Product Image (optional)</label>
-              <input type="file" accept="image/*" onChange={handleImageChange} />
+              <label className="block font-semibold mb-1 text-gray-700">
+                Product Image (optional)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
               {imagePreview && (
                 <img
                   src={imagePreview}
@@ -111,7 +121,9 @@ export default function StoreProduct() {
           </form>
 
           {/* Product List */}
-          <h2 className="text-xl md:text-2xl font-semibold mb-4">Your Products</h2>
+          <h2 className="text-xl md:text-2xl font-semibold mb-4 text-gray-800">
+            Your Products
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />

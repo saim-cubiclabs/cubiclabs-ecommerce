@@ -48,9 +48,9 @@ export default function StoreSetup() {
 
   return (
     <LayoutWithSidebar>
-      <div className="p-4 md:p-6">
+      <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl md:text-3xl font-bold mb-6 font-sans text-center">
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800 text-center">
             Store Setup
           </h1>
 
@@ -58,13 +58,15 @@ export default function StoreSetup() {
             onSubmit={handleSubmit}
             className="bg-white p-4 md:p-6 rounded-xl shadow-md space-y-4"
           >
-            <h2 className="text-xl font-semibold font-sans text-center">
+            <h2 className="text-xl font-semibold text-gray-800 text-center">
               Create Your Store
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block font-semibold mb-1">Store Name *</label>
+                <label className="block font-semibold mb-1 text-gray-700">
+                  Store Name *
+                </label>
                 <input
                   type="text"
                   value={storeName}
@@ -75,7 +77,9 @@ export default function StoreSetup() {
               </div>
 
               <div>
-                <label className="block font-semibold mb-1">Category *</label>
+                <label className="block font-semibold mb-1 text-gray-700">
+                  Category *
+                </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
@@ -91,7 +95,9 @@ export default function StoreSetup() {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1">Store URL</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Store URL
+              </label>
               <input
                 type="text"
                 value={storeURL}
@@ -105,7 +111,9 @@ export default function StoreSetup() {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1">Description</label>
+              <label className="block font-semibold mb-1 text-gray-700">
+                Description
+              </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -116,7 +124,7 @@ export default function StoreSetup() {
             </div>
 
             <div>
-              <label className="block font-semibold mb-1">
+              <label className="block font-semibold mb-1 text-gray-700">
                 Logo (optional)
               </label>
               <input
